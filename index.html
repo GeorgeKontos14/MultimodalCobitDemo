@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Project page for Multimodal Co-Generation with Continuous Bitstream Diffusion.">
+  <title>Multimodal Co-Generation with Continuous Bitstream Diffusion</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Multimodal CoBit home">
+      <span>Multimodal CoBit</span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="#mnist">Image–Text</a>
+      <a href="#speech">Speech–Text</a>
+      <a href="#protein">Protein</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="paper-intro">
+        <h1>Multimodal Co-Generation with Continuous Bitstream Diffusion</h1>
+        <div class="paper-authors" aria-label="Authors">
+          <span>Georgios Batzolis</span>
+          <span>Georgios Kontos</span>
+          <span>Bruno Trentini</span>
+          <span>Pranam Chatterjee</span>
+          <span>Micha Livne</span>
+          <span>Mark Girolami</span>
+          <span>Luca Ambrogioni</span>
+        </div>
+        <div class="hero-actions">
+          <a class="button button-primary" href="https://arxiv.org/pdf/2610.14349" target="_blank" rel="noreferrer">Paper <span aria-hidden="true">↗</span></a>
+          <a class="button button-secondary" href="https://github.com/GBATZOLIS/BitstreamDiffusion/" target="_blank" rel="noreferrer">Github <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+
+      <div class="abstract-block">
+        <p class="abstract-label">Abstract</p>
+        <p>Continuous bitstream diffusion (CoBit), first introduced for language modeling, is applied here as a unified framework for joint and conditional multimodal generation. Separate image–text, speech–text, and protein sequence–structure models share the same core architecture, binary score-matching objective, and sampling procedure across modalities. Within each setting, changing which portions of the bitstream are observed lets one checkpoint support multiple generation directions. Experiments span raw-pixel MNIST-SUM, speech synthesis and recognition, and protein folding and design. Jointly generated speech and text reach 3.5% cross-modal word error rate, while jointly generated proteins achieve a mean self-consistency TM-score of 0.911—all without a domain-specific objective or sampler.</p>
+      </div>
+    </section>
+
+    <section class="content-section experiment-section mnist-section" id="mnist">
+      <div class="section-index">01</div>
+      <div class="section-heading experiment-heading">
+        <div>
+          <p class="eyebrow">Image + text</p>
+          <h2>MNIST-SUM</h2>
+        </div>
+        <p>Four binarized MNIST digits form a 2×2 image and a matching equation. A single checkpoint reads and adds an image, draws digits from text, or generates both modalities together.</p>
+      </div>
+
+      <div class="experiment-spec">
+        <div class="representation-overview">
+          <div class="spec-title-row">
+            <div>
+              <p class="spec-kicker">No learned tokenizer</p>
+              <h3>Shared Sequence Structure</h3>
+            </div>
+            <span class="spec-badge">121 positions × 28 bits</span>
+          </div>
+
+          <div class="codec-sequence mnist-codec" aria-label="Equation and image represented in one sequence">
+            <div class="codec-segment codec-text">
+              <span class="codec-index">01</span>
+              <div><strong>Equation</strong><small>12 symbols · 7-bit code</small></div>
+            </div>
+            <div class="codec-segment codec-image">
+              <span class="codec-index">02</span>
+              <div><strong>Image</strong><small>4 × 28 × 28 raw binary pixels</small></div>
+            </div>
+          </div>
+
+          <div class="codec-notes mnist-codec-notes" aria-label="MNIST-SUM sequence details">
+            <span>Text <b>3 positions · 84 bits</b></span>
+            <span>Image <b>112 positions · 3,136 bits</b></span>
+          </div>
+          <div class="vocab-result geometry-result">
+            <span>Flat sample geometry</span>
+            <strong>3,388 bits <i aria-hidden="true">→</i> one model sequence</strong>
+            <small>Includes 168 control bits · one image position is one digit row</small>
+          </div>
+        </div>
+
+        <h3 class="model-spec-heading">MNIST-SUM Checkpoint</h3>
+        <div class="model-spec-wrap">
+          <table class="model-spec-table mnist-model-table">
+            <thead>
+              <tr>
+                <th>Checkpoint</th>
+                <th>Training set</th>
+                <th>Parameters</th>
+                <th>Sequence geometry</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>CoBit-MNIST-SUM</strong><small>12 layers × 512 · step 500K</small></td>
+                <td>1,000,000 pairs<small>10K validation · 10K held-out tuples</small></td>
+                <td><strong>63.0M</strong></td>
+                <td><code>3 text + 112 image + control</code><small>121 total positions · 28 bits each</small></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="headline-results" aria-label="MNIST-SUM headline results">
+          <article class="result-stat">
+            <span>Image → text</span>
+            <strong>97.56%</strong>
+            <small>exact equation · validation</small>
+          </article>
+          <article class="result-stat">
+            <span>Text → image</span>
+            <strong>99.95%</strong>
+            <small>all four digits · validation</small>
+          </article>
+          <article class="result-stat">
+            <span>Joint</span>
+            <strong>99.46%</strong>
+            <small>mutually consistent pair</small>
+          </article>
+        </div>
+      </div>
+
+      <div class="experiment-browser" data-experiment="mnist">
+        <aside class="task-rail" aria-label="MNIST-SUM tasks">
+          <p class="rail-label">Task</p>
+          <div id="mnist-task-nav" class="task-nav" role="tablist" aria-orientation="vertical"></div>
+        </aside>
+        <div class="results-stage">
+          <div class="results-toolbar">
+            <div>
+              <p class="eyebrow" id="mnist-task-kicker">Image conditioned</p>
+              <h3 id="mnist-task-title">Image-to-text</h3>
+              <p id="mnist-task-description">Read four supplied digits and generate their exact equation and sum.</p>
+            </div>
+          </div>
+          <div id="mnist-process-map" class="process-map" aria-live="polite"></div>
+          <div id="mnist-samples" class="experiment-samples" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section speech-section" id="speech">
+      <div class="section-index">02</div>
+      <div class="section-heading speech-heading">
+        <div>
+          <p class="eyebrow">Speech + text</p>
+          <h2>Speech+Text</h2>
+        </div>
+        <p>Text and speech tokens of the same utterance are concatenated. For additional voice control and zero-shot text-to-speech, the sequence is augmented with a fixed-length global speaker representation.</p>
+      </div>
+
+      <div class="speech-spec">
+        <div class="codec-overview">
+          <div class="spec-title-row">
+            <div>
+              <h3>Shared Sequence Structure</h3>
+            </div>
+          </div>
+
+          <div class="codec-sequence" aria-label="Text encoded by o200k base, speaker encoded by BiCodec global tokens, and speech encoded by StableCodec">
+            <div class="codec-segment codec-text">
+              <span class="codec-index">01</span>
+              <div><strong>Text</strong><small>o200k_base</small></div>
+            </div>
+            <div class="codec-segment codec-speaker">
+              <span class="codec-index">02</span>
+              <div><strong>Speaker</strong><small>BiCodec · global</small></div>
+            </div>
+            <div class="codec-segment codec-speech">
+              <span class="codec-index">03</span>
+              <div><strong>Speech</strong><small>StableCodec · 16 kHz</small></div>
+            </div>
+          </div>
+
+          <div class="codec-notes" aria-label="Codec details">
+            <span>Text vocab <b>200,019</b></span>
+            <span>Speaker vocab <b>4,096</b></span>
+            <span>Speech vocab <b>46,656</b></span>
+          </div>
+          <div class="vocab-result">
+            <span>Shared vocabulary + special symbols</span>
+            <strong>250,773 IDs <i aria-hidden="true">→</i> 18-bit vocabulary</strong>
+            <small>Capacity: 2<sup>18</sup> = 262,144</small>
+          </div>
+        </div>
+
+        <h3 class="model-spec-heading">Speech+Text Checkpoints</h3>
+        <div class="model-spec-wrap">
+          <table class="model-spec-table">
+            <thead>
+              <tr>
+                <th>Checkpoint</th>
+                <th>Training set</th>
+                <th>Parameters</th>
+                <th>Sequence geometry</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>CoBit-LibriTTS</strong><small>12 layers × 768</small></td>
+                <td>LibriTTS<small>≈350K pairs</small></td>
+                <td><strong>134M</strong></td>
+                <td><code>168 text + 32 speaker + 800 speech</code><small>1,000 total positions</small></td>
+              </tr>
+              <tr>
+                <td><strong>CoBit-MLS</strong><small>26 layers × 1,152</small></td>
+                <td>LibriTTS + MLS-English<small>≈11M pairs</small></td>
+                <td><strong>633M</strong></td>
+                <td><code>100 text + 32 speaker + 500 speech</code><small>632 total positions</small></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="headline-results speech-results" aria-label="CoBit-MLS headline results">
+          <article class="result-stat">
+            <span>Text → speech</span>
+            <strong>5.3%</strong>
+            <small>WER ↓ · UTMOS 4.00</small>
+          </article>
+          <article class="result-stat">
+            <span>Speech → text</span>
+            <strong>8.2%</strong>
+            <small>WER ↓ · 22.0% on test-other</small>
+          </article>
+          <article class="result-stat">
+            <span>Continuation</span>
+            <strong>3.89</strong>
+            <small>UTMOS ↑ · SpkSim 0.34</small>
+          </article>
+          <article class="result-stat">
+            <span>Joint</span>
+            <strong>3.5%</strong>
+            <small>cross-modal WER ↓ · UTMOS 3.77</small>
+          </article>
+        </div>
+      </div>
+
+      <div class="speech-browser">
+        <aside class="task-rail" aria-label="Speech tasks">
+          <p class="rail-label">Task</p>
+          <div id="task-nav" class="task-nav" role="tablist" aria-orientation="vertical"></div>
+        </aside>
+
+        <div class="results-stage">
+          <div class="results-toolbar">
+            <div>
+              <p class="eyebrow" id="task-kicker">Unconditional</p>
+              <h3 id="task-title">Joint generation</h3>
+              <p id="task-description">Generate speech and its transcript together from noise.</p>
+            </div>
+          </div>
+          <div id="process-map" class="process-map" aria-live="polite"></div>
+          <div id="speech-content" class="speech-content" aria-live="polite">
+            <div class="loading-state">
+              <span class="loading-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+              <p>Loading speech evaluations…</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section experiment-section protein-section" id="protein">
+      <div class="section-index">03</div>
+      <div class="section-heading experiment-heading">
+        <div>
+          <p class="eyebrow">Sequence + structure</p>
+          <h2>Protein</h2>
+        </div>
+        <p>A residue-aligned bitstream pairs amino-acid identity with a frozen structure code. The same checkpoint supports forward folding, inverse folding, and joint sequence–structure generation.</p>
+      </div>
+
+      <div class="experiment-spec">
+        <div class="representation-overview">
+          <div class="spec-title-row">
+            <div>
+              <p class="spec-kicker">Residue-aligned representation</p>
+              <h3>Shared Sequence Structure</h3>
+            </div>
+            <span class="spec-badge">Up to 512 residues</span>
+          </div>
+
+          <div class="residue-visual" aria-label="Each residue position contains five amino-acid bits followed by thirteen structure bits">
+            <div class="residue-segment residue-sequence">
+              <span>01–05</span>
+              <strong>Amino acid</strong>
+              <small>raw binary · 20 canonical residues</small>
+            </div>
+            <div class="residue-segment residue-structure">
+              <span>06–18</span>
+              <strong>Structure</strong>
+              <small>DPLM-2 LFQ · 8,192 codes</small>
+            </div>
+          </div>
+          <div class="vocab-result geometry-result protein-geometry-result">
+            <span>Per-residue patch</span>
+            <strong>5 sequence bits + 13 structure bits <i aria-hidden="true">→</i> 18 bits</strong>
+            <small>Structure tokenizer remains frozen</small>
+          </div>
+        </div>
+
+        <h3 class="model-spec-heading">Protein Checkpoint</h3>
+        <div class="model-spec-wrap">
+          <table class="model-spec-table protein-model-table">
+            <thead>
+              <tr>
+                <th>Checkpoint</th>
+                <th>Training set</th>
+                <th>Parameters</th>
+                <th>Sequence geometry</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>CoBit-Protein</strong><small>20 layers × 1,024 · 300K steps</small></td>
+                <td>216,237 paired chains<small>PDB + AFDB-SwissProt · 20% UniRef50 replay</small></td>
+                <td><strong>396M</strong></td>
+                <td><code>512 residues × (5 seq + 13 structure)</code><small>one 18-bit position per residue</small></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="headline-results" aria-label="Protein headline results">
+          <article class="result-stat">
+            <span>Inverse folding</span>
+            <strong>44.10%</strong>
+            <small>mean sequence recovery · CATH 4.3</small>
+          </article>
+          <article class="result-stat">
+            <span>Forward folding</span>
+            <strong>0.554</strong>
+            <small>mean TM-score · CAMEO</small>
+          </article>
+          <article class="result-stat">
+            <span>Joint generation</span>
+            <strong>0.911</strong>
+            <small>mean self-consistency TM-score</small>
+          </article>
+        </div>
+      </div>
+
+      <div class="experiment-browser" data-experiment="protein">
+        <aside class="task-rail" aria-label="Protein tasks">
+          <p class="rail-label">Task</p>
+          <div id="protein-task-nav" class="task-nav" role="tablist" aria-orientation="vertical"></div>
+        </aside>
+        <div class="results-stage">
+          <div class="results-toolbar">
+            <div>
+              <p class="eyebrow" id="protein-task-kicker">Sequence conditioned</p>
+              <h3 id="protein-task-title">Forward folding</h3>
+              <p id="protein-task-description">Keep the amino-acid sequence fixed and generate its structure codes.</p>
+            </div>
+          </div>
+          <div id="protein-process-map" class="process-map" aria-live="polite"></div>
+          <div id="protein-samples" class="experiment-samples" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="speech-data.js"></script>
+  <script src="experiment-data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
